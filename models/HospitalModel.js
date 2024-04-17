@@ -48,7 +48,7 @@ const HospitalSchema = new mongoose.Schema({
             state : String,
             street: String
         },
-        type:String,
+        typeOfHospital:String,
         servicesOffered: Array,
         to: String
     },
