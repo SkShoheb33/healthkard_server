@@ -48,7 +48,8 @@ const HospitalSchema = new mongoose.Schema({
             state : String,
             street: String
         },
-        servicesOffered: String,
+        type:String,
+        servicesOffered: Array,
         to: String
     },
     doctorList: [
