@@ -58,7 +58,7 @@ app.post('/sendOTP', async (req, res) => {
         });
 
         const info = await transporter.sendMail({
-            from: '"Sender Name 👻" <healthkard99@gmail.com>',
+            from: '"Healthkard" <healthkard99@gmail.com>',
             to: to,
             subject: subject,
             text: `Your OTP is: ${otp}`,
@@ -556,7 +556,7 @@ app.post('/sendCardURL', async (req, res) => {
         });
 
         const info = await transporter.sendMail({
-            from: '"Sender Name 👻" <healthkard99@gmail.com>',
+            from: '"Healthkard" <healthkard99@gmail.com>',
             to: to,
             subject: subject,
             text: `Your Card URL is: ${url}`,
@@ -585,7 +585,7 @@ app.post('/denyReason', async (req, res) => {
         });
 
         const info = await transporter.sendMail({
-            from: '"Sender Name 👻" <healthkard99@gmail.com>',
+            from: '"Healthkard" <healthkard99@gmail.com>',
             to: to,
             subject: subject,
             text: body,
