@@ -335,6 +335,17 @@ app.delete('/deleteProfile/:hospitalId', async (req, res) => {
         res.status(500).json({ message: "Error deleting hospital profile", error: error.message });
     }
 });
+// get hospital basic details
+app.get('/hospitals', async (req, res) => {
+    try {
+        const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1 });
+
+        res.json(hospitals);
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Server Error" });
+    }
+});
 
 
 // agent routes
