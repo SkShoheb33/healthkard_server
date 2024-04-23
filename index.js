@@ -7,10 +7,8 @@ const HospitalModel = require('./models/HospitalModel');
 const AgentModel = require('./models/AgentModel');
 const UserModel = require('./models/UserModel');
 const nodemailer = require("nodemailer");
-// const emailController = require('./backend/controllers/emailController');
 const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
-console.log(mongoURI)
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
 
@@ -126,6 +124,21 @@ app.get('/getMediaDeatils/:hospitalId', async (req,res)=>{
         const result = await HospitalModel.findOne({ hospitalId });
         if (result) {
             res.status(200).json(result.mediaDetails);
+        } else {
+            res.status(200).json({ email: "not found", isverified: "0" });
+        }
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting full hospital  Details by id
+app.get('/getHospital/:hospitalId', async (req,res)=>{
+    const hospitalId = req.params.hospitalId;
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).json(result);
         } else {
             res.status(200).json({ email: "not found", isverified: "0" });
         }
@@ -346,7 +359,6 @@ app.get('/hospitals', async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 });
-
 
 // agent routes
 // Route to add an agent
