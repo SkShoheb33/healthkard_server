@@ -351,7 +351,7 @@ app.delete('/deleteProfile/:hospitalId', async (req, res) => {
 // get hospital basic details
 app.get('/hospitals', async (req, res) => {
     try {
-        const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1 });
+        const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1 ,'mediaDetails.hospitalImageURL':1});
 
         res.json(hospitals);
     } catch (error) {
@@ -369,6 +369,16 @@ app.post('/addAgent', async (req, res) => {
         res.status(200).send('Agent data saved successfully');
     } catch (err) {
         res.status(500).send('Error saving Agent data');
+    }
+});
+app.post('/reset-todays-count', async (req, res) => {
+    try {
+        // Update all agents to set todaysCount to 0
+        await AgentModel.updateMany({}, { $set: { todaysCount: 0 } });
+
+        res.status(200).json({ message: 'Todays count reset for all agents' });
+    } catch (error) {
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 });
 
