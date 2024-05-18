@@ -1,5 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
+const uniqid = require('uniqid');
+const sha256 = require('sha256');
 const app = express();
 require('dotenv').config();
 // const serverless = require('serverless-http');
@@ -11,10 +14,14 @@ const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
-
+const corsOptions ={
+    origin:process.env.HOST_ADDRESS, 
+    credentials:true,      
+    optionSuccessStatus:200
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: process.env.HOST_ADDRESS, credentials: true }));
+app.use(cors(corsOptions));
 
 app.get('/', (req, res) => {
     res.status(200).send('Server is running');
@@ -461,6 +468,19 @@ app.put('/addUser/:agentID', async (req, res) => {
         return res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// update the payment status
+app.put('/payment/:healthId',async (req,res)=>{
+    const healthId = req.params.healthId;
+    const paymentStatus = req.body.paymentStatus;
+    try{
+        const user = await UserModel.findOne({healthId});
+        user.paymentStatus = paymentStatus;
+        await user.save();
+    }catch(err){
+        console.log("Error while updating the status");
+    }
+    
+})
 // code to add the users to agents table
 app.put('/addHospital/:agentID', async (req, res) => {
     const agentID = req.params.agentID;
@@ -648,4 +668,152 @@ app.put('/visited/:healthId', async (req, res) => {
     }
 });
 
-// module.exports.handler = serverless(app);
+
+const PHONE_PE_HOST_URL = process.env.PHONE_PE_HOST_URL;
+const MERCHANT_ID = process.env.MERCHANT_ID;
+const SALT_INDEX = process.env.SALT_INDEX;
+const SALT_KEY = process.env.SALT_KEY;
+let HEALTHKARD_ID = "";
+let IS_NEW = true;
+let PLAN = "one month"
+const planPrices = {
+    'one month': 99,
+    'three months': 297,
+    'six months': 499,
+    'one year': 899
+};
+app.get('/pay',(req,res)=>{
+    const { name,mobileNumber,healthID,plan,isNew } = req.query;
+    PLAN = plan;
+    const amount = planPrices[plan];
+    IS_NEW = isNew;
+    HEALTHKARD_ID = healthID;
+    const payEndPoint = '/pg/v1/pay';
+    let merchantTransactionId = uniqid();
+    let merchantUserId = "MUID123";
+    const payload ={
+      "merchantId": MERCHANT_ID,
+      "merchantTransactionId": merchantTransactionId,
+      "merchantUserId": merchantUserId,
+      "amount": amount*100,
+      "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}`,
+      "redirectMode": "GET",
+      "name": name,
+      "mobileNumber": mobileNumber,
+      "paymentInstrument": {
+        "type": "PAY_PAGE"
+      }
+    }
+    let bufferObj = Buffer.from(JSON.stringify(payload), "utf8");
+    let base64EncodedPayload = bufferObj.toString("base64");
+    const xVerify = sha256(base64EncodedPayload+payEndPoint+SALT_KEY) + "###" + SALT_INDEX;
+    const options = {
+      method: 'post',
+      url: `${PHONE_PE_HOST_URL}${payEndPoint}`,
+      headers: {
+            accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-VERIFY': xVerify,
+            },
+    data: {
+      request:base64EncodedPayload
+    }
+    };
+    axios
+      .request(options)
+          .then(function (response) {
+          const url = response.data.data.instrumentResponse.redirectInfo.url;
+          // res.send(url);
+          res.redirect(url);
+          // res.send(response.data)
+      })
+      .catch(function (error) {
+        res.send({message:"Error",error})
+      });
+  })
+  app.get("/redirect-url/:merchantTransactionId", async (req, res) => {
+    const { merchantTransactionId } = req.params;
+    if (merchantTransactionId) {
+        try {
+            const xVerify = sha256(`/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}` + SALT_KEY) + "###" + SALT_INDEX;
+            const options = {
+                method: 'get',
+                url: `${PHONE_PE_HOST_URL}/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}`,
+                headers: {
+                    accept: 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-MERCHANT-ID': MERCHANT_ID,
+                    'X-VERIFY': xVerify
+                }
+            };
+            const response = await axios.request(options);
+            if (response.data.code === "PAYMENT_SUCCESS") {
+                console.log("payment ")
+                if(IS_NEW)
+                    await axios.put(`${process.env.SERVER_URL}/payment/${HEALTHKARD_ID}`, { paymentStatus: true })
+                else
+                    await axios.post(`${process.env.SERVER_URL}/renewal/${HEALTHKARD_ID}`, { planDuration: PLAN })
+                res.send(200).send("Payment successfull")
+            } else {
+                console.log("Payment failed:", response.data);
+                res.status(400).send("Payment failed");
+            }
+            // res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
+        } catch (error) {
+            console.error("Error during payment status check or update:");
+            res.status(500).send(`You can get your card by clicking this : https://healthkard.in/userCard/${HEALTHKARD_ID}`);
+        }
+    } else {
+        res.status(400).send({ error: "Invalid merchantTransactionId" });
+    }
+  });
+
+
+//   renewal route
+// Define the plan durations in days
+const planDurations = {
+    'one month': 28,
+    'three months': 84,
+    'six months': 168,
+    'one year': 336
+};
+
+app.post('/renewal/:healthId', async (req, res) => {
+    const { healthId } = req.params;
+    const { planDuration } = req.body;
+
+    try {
+        // Find the user by healthId
+        const user = await UserModel.findOne({ healthId });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Get the plan duration in days
+        const durationInDays = planDurations[planDuration.toLowerCase()];
+        if (!durationInDays) {
+            return res.status(400).json({ message: 'Invalid plan duration' });
+        }
+
+        // Determine the new expiration date
+        const currentDate = new Date();
+        const baseDate = user.expireDate && user.expireDate > currentDate ? user.expireDate : currentDate;
+        const newExpireDate = new Date(baseDate);
+        newExpireDate.setDate(newExpireDate.getDate() + durationInDays);
+
+        // Update the user's startDate and expireDate
+        user.startDate = user.expireDate && user.expireDate > currentDate ? user.startDate : currentDate;
+        user.expireDate = newExpireDate;
+        user.lastPlan = planDuration;
+
+        // Save the updated user
+        await user.save();
+
+        res.json({ message: 'User renewed successfully', user });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
