@@ -704,6 +704,7 @@ app.get('/pay',(req,res)=>{
         "type": "PAY_PAGE"
       }
     }
+    console.log(process.env.SERVER_URL)
     let bufferObj = Buffer.from(JSON.stringify(payload), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     const xVerify = sha256(base64EncodedPayload+payEndPoint+SALT_KEY) + "###" + SALT_INDEX;
