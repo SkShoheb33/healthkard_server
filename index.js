@@ -567,6 +567,15 @@ app.get('/getUser/:healthId', async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+app.get('/getUserByNumber/:number', async (req, res) => {
+    try {
+        const result = await UserModel.find({number:req.params.number});
+        res.status(200).json(result);
+    } catch (err) {
+        console.error("Error while retrieving user data:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 // stats for users active and total
 app.get('/userStats', async (req, res) => {
     try {
