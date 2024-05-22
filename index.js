@@ -476,6 +476,7 @@ app.put('/payment/:healthId',async (req,res)=>{
         const user = await UserModel.findOne({healthId});
         user.paymentStatus = paymentStatus;
         await user.save();
+        res.send("Successfully updated");
     }catch(err){
         console.log("Error while updating the status");
     }
@@ -535,11 +536,12 @@ app.get('/getuserDetails/:userId', async (req,res)=>{
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
+
 app.get('/getUserNameID', async (req, res) => {
     try {
         const results = await UserModel.find({});
         if (results.length > 0) {
-            const users = results.map(user => ({ name: user.name, healthId: user.healthId }));
+            const users = results.map(user => ({ name: user.name, healthId: user.healthId,paymentStatus: user.paymentStatus }));
             res.status(200).json(users);
         } else {
             res.status(200).json({ message: "No users found" });
@@ -579,17 +581,14 @@ app.get('/getUserByNumber/:number', async (req, res) => {
 // stats for users active and total
 app.get('/userStats', async (req, res) => {
     try {
-        // Get all users from the database
-        const allUsers = await UserModel.find({});
-
-        // Calculate the total number of users
-        const totalUsers = allUsers.length;
-
-        // Calculate the number of active users
         const currentDate = new Date();
+        await UserModel.updateMany(
+            { expireDate: { $lt: currentDate } },
+            { $set: { paymentStatus: false } }
+        );
+        const allUsers = await UserModel.find({});
+        const totalUsers = allUsers.length;
         const activeUsers = allUsers.filter(user => user.expireDate > currentDate).length;
-
-        // Send the response with the user stats
         res.status(200).json({
             user: totalUsers,
             active: activeUsers
@@ -599,7 +598,7 @@ app.get('/userStats', async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-// sending the url 
+
 app.post('/sendCardURL', async (req, res) => {
     const { to, subject, url } = req.body;
     try {
@@ -693,6 +692,7 @@ const planPrices = {
 };
 app.get('/pay',(req,res)=>{
     const { name,mobileNumber,healthID,plan,isNew } = req.query;
+    console.log(name,mobileNumber,healthID,plan,isNew);
     PLAN = plan;
     const amount = planPrices[plan];
     IS_NEW = isNew;
@@ -713,7 +713,6 @@ app.get('/pay',(req,res)=>{
         "type": "PAY_PAGE"
       }
     }
-    console.log(process.env.SERVER_URL)
     let bufferObj = Buffer.from(JSON.stringify(payload), "utf8");
     let base64EncodedPayload = bufferObj.toString("base64");
     const xVerify = sha256(base64EncodedPayload+payEndPoint+SALT_KEY) + "###" + SALT_INDEX;
@@ -768,7 +767,7 @@ app.get('/pay',(req,res)=>{
                 console.log("Payment failed:", response.data);
                 res.status(400).send("Payment failed");
             }
-            // res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
+            res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
         } catch (error) {
             console.error("Error during payment status check or update:");
             res.status(500).send(`You can get your card by clicking this : https://healthkard.in/userCard/${HEALTHKARD_ID}`);
@@ -791,7 +790,6 @@ const planDurations = {
 app.post('/renewal/:healthId', async (req, res) => {
     const { healthId } = req.params;
     const { planDuration } = req.body;
-
     try {
         // Find the user by healthId
         const user = await UserModel.findOne({ healthId });
@@ -815,7 +813,7 @@ app.post('/renewal/:healthId', async (req, res) => {
         user.startDate = user.expireDate && user.expireDate > currentDate ? user.startDate : currentDate;
         user.expireDate = newExpireDate;
         user.lastPlan = planDuration;
-
+        user.paymentStatus = true;
         // Save the updated user
         await user.save();
 
