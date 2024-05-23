@@ -522,6 +522,32 @@ app.post('/addUser', async (req, res) => {
     }
 });
 
+app.delete('/user/:userId',async(req,res)=>{
+    const healthId = req.params.userId;
+    try {
+        const result = await UserModel.findOneAndDelete({ healthId });
+        if (result) {
+            res.status(200).json({message:"deleted successfully"});
+        } else {
+            res.status(200).json({ user: "not found"});
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+app.delete('/agent/:agentID',async(req,res)=>{
+    const agentID = req.params.agentID;
+    try {
+        const result = await AgentModel.findOneAndDelete({ agentID });
+        if (result) {
+            res.status(200).json({message:"deleted successfully"});
+        } else {
+            res.status(200).json({ user: "not found"});
+        }
+    } catch (err) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
 app.get('/getuserDetails/:userId', async (req,res)=>{
     const healthId = req.params.userId;
     try {
@@ -692,7 +718,6 @@ const planPrices = {
 };
 app.get('/pay',(req,res)=>{
     const { name,mobileNumber,healthID,plan,isNew } = req.query;
-    console.log(name,mobileNumber,healthID,plan,isNew);
     PLAN = plan;
     const amount = planPrices[plan];
     IS_NEW = isNew;
@@ -758,10 +783,10 @@ app.get('/pay',(req,res)=>{
             const response = await axios.request(options);
             if (response.data.code === "PAYMENT_SUCCESS") {
                 console.log("payment ")
-                if(IS_NEW)
+                if(IS_NEW==true)
                     await axios.put(`${process.env.SERVER_URL}/payment/${HEALTHKARD_ID}`, { paymentStatus: true })
                 else
-                    await axios.post(`${process.env.SERVER_URL}/renewal/${HEALTHKARD_ID}`, { planDuration: PLAN })
+                    await axios.put(`${process.env.SERVER_URL}/renewal/${HEALTHKARD_ID}`, { planDuration: PLAN })
                 res.send(200).send("Payment successfull")
             } else {
                 console.log("Payment failed:", response.data);
@@ -787,7 +812,7 @@ const planDurations = {
     'one year': 336
 };
 
-app.post('/renewal/:healthId', async (req, res) => {
+app.put('/renewal/:healthId', async (req, res) => {
     const { healthId } = req.params;
     const { planDuration } = req.body;
     try {
