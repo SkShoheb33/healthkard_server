@@ -731,8 +731,7 @@ app.get('/pay',(req,res)=>{
       "merchantUserId": merchantUserId,
       "amount": amount*100,
       "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}`,
-      "redirectMode": "GET",
-      "name": name,
+      "redirectMode": "POST",
       "mobileNumber": mobileNumber,
       "paymentInstrument": {
         "type": "PAY_PAGE"
@@ -787,15 +786,16 @@ app.get('/pay',(req,res)=>{
                     await axios.put(`${process.env.SERVER_URL}/payment/${HEALTHKARD_ID}`, { paymentStatus: true })
                 else
                     await axios.put(`${process.env.SERVER_URL}/renewal/${HEALTHKARD_ID}`, { planDuration: PLAN })
-                res.send(200).send("Payment successfull")
+                // res.send(200).send("Payment successfull")
+                res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
             } else {
                 console.log("Payment failed:", response.data);
                 res.status(400).send("Payment failed");
             }
-            res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
         } catch (error) {
             console.error("Error during payment status check or update:");
-            res.status(500).send(`You can get your card by clicking this : https://healthkard.in/userCard/${HEALTHKARD_ID}`);
+            res.send("Please contact to healthkard team");
+            // res.status(500).send(`You can get your card by clicking this : https://healthkard.in/userCard/${HEALTHKARD_ID}`);
         }
     } else {
         res.status(400).send({ error: "Invalid merchantTransactionId" });
