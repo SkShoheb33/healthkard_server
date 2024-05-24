@@ -732,6 +732,7 @@ app.get('/pay',(req,res)=>{
       "amount": amount*100,
       "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}`,
       "redirectMode": "POST",
+      "callbackUrl":`https://healthkard.in/userCard/${HEALTHKARD_ID}`,
       "mobileNumber": mobileNumber,
       "paymentInstrument": {
         "type": "PAY_PAGE"
