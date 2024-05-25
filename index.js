@@ -707,9 +707,6 @@ const PHONE_PE_HOST_URL = process.env.PHONE_PE_HOST_URL;
 const MERCHANT_ID = process.env.MERCHANT_ID;
 const SALT_INDEX = process.env.SALT_INDEX;
 const SALT_KEY = process.env.SALT_KEY;
-let HEALTHKARD_ID = "";
-let IS_NEW = true;
-let PLAN = "one month"
 const planPrices = {
     'one month': 99,
     'three months': 297,
@@ -718,10 +715,7 @@ const planPrices = {
 };
 app.get('/pay',(req,res)=>{
     const { name,mobileNumber,healthID,plan,isNew } = req.query;
-    PLAN = plan;
     const amount = planPrices[plan];
-    IS_NEW = isNew;
-    HEALTHKARD_ID = healthID;
     const payEndPoint = '/pg/v1/pay';
     let merchantTransactionId = uniqid();
     let merchantUserId = "MUID123";
@@ -730,7 +724,7 @@ app.get('/pay',(req,res)=>{
       "merchantTransactionId": merchantTransactionId,
       "merchantUserId": merchantUserId,
       "amount": amount*100,
-      "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}`,
+      "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}/?healthID=${healthID}&plan=${plan}&isNew=${isNew}`,
       "redirectMode": "POST",
       "callbackUrl":`https://healthkard.in/userCard/${HEALTHKARD_ID}`,
       "mobileNumber": mobileNumber,
@@ -767,6 +761,7 @@ app.get('/pay',(req,res)=>{
   })
   app.get("/redirect-url/:merchantTransactionId", async (req, res) => {
     const { merchantTransactionId } = req.params;
+    const { healthID,plan,isNew } = req.query;
     if (merchantTransactionId) {
         try {
             const xVerify = sha256(`/pg/v1/status/${MERCHANT_ID}/${merchantTransactionId}` + SALT_KEY) + "###" + SALT_INDEX;
@@ -783,12 +778,12 @@ app.get('/pay',(req,res)=>{
             const response = await axios.request(options);
             if (response.data.code === "PAYMENT_SUCCESS") {
                 console.log("payment ")
-                if(IS_NEW==true)
-                    await axios.put(`${process.env.SERVER_URL}/payment/${HEALTHKARD_ID}`, { paymentStatus: true })
+                if(isNew==true)
+                    await axios.put(`${process.env.SERVER_URL}/payment/${healthID}`, { paymentStatus: true })
                 else
-                    await axios.put(`${process.env.SERVER_URL}/renewal/${HEALTHKARD_ID}`, { planDuration: PLAN })
+                    await axios.put(`${process.env.SERVER_URL}/renewal/${healthID}`, { planDuration: plan })
                 // res.send(200).send("Payment successfull")
-                res.redirect(`https://healthkard.in/userCard/${HEALTHKARD_ID}`);
+                res.redirect(`https://healthkard.in/userCard/${healthID}`);
             } else {
                 console.log("Payment failed:", response.data);
                 res.status(400).send("Payment failed");
