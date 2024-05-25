@@ -725,8 +725,8 @@ app.get('/pay',(req,res)=>{
       "merchantUserId": merchantUserId,
       "amount": amount*100,
       "redirectUrl": `${process.env.SERVER_URL}/redirect-url/${merchantTransactionId}/?healthID=${healthID}&plan=${plan}&isNew=${isNew}`,
-      "redirectMode": "POST",
-      "callbackUrl":`https://healthkard.in/userCard/${HEALTHKARD_ID}`,
+      "redirectMode": "GET",
+      "callbackUrl":`https://healthkard.in/userCard/${healthID}`,
       "mobileNumber": mobileNumber,
       "paymentInstrument": {
         "type": "PAY_PAGE"
@@ -736,7 +736,7 @@ app.get('/pay',(req,res)=>{
     let base64EncodedPayload = bufferObj.toString("base64");
     const xVerify = sha256(base64EncodedPayload+payEndPoint+SALT_KEY) + "###" + SALT_INDEX;
     const options = {
-      method: 'post',
+      method: 'POST',
       url: `${PHONE_PE_HOST_URL}${payEndPoint}`,
       headers: {
             accept: 'application/json',
@@ -777,7 +777,6 @@ app.get('/pay',(req,res)=>{
             };
             const response = await axios.request(options);
             if (response.data.code === "PAYMENT_SUCCESS") {
-                console.log("payment ")
                 if(isNew==true)
                     await axios.put(`${process.env.SERVER_URL}/payment/${healthID}`, { paymentStatus: true })
                 else
