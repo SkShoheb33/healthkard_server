@@ -845,3 +845,35 @@ app.put('/renewal/:healthId', async (req, res) => {
 });
 
 
+
+// send mail
+app.post('/sendMail', async (req, res) => {
+    const { subject, message } = req.body;
+    try {
+        
+        let transporter = nodemailer.createTransport({
+            host: "smtp.gmail.com",
+            port: 587,
+            secure: false,
+            auth: {
+                user: process.env.EMAIL,
+                pass: process.env.PASS
+            },
+            tls: {
+                rejectUnauthorized: false
+            }
+        });
+
+        const info = await transporter.sendMail({
+            from: '"Healthkard" <healthkard99@gmail.com>',
+            to: 'healthkard99@gmail.com',
+            subject: subject,
+            text: message,
+        });
+        res.json(info);
+    } catch (error) {
+        console.error("Error sending email:", error);
+        res.status(500).json({ error: "An error occurred while sending the email.", error });
+    }
+});
+
