@@ -344,7 +344,7 @@ app.delete('/deleteProfile/:hospitalId', async(req, res) => {
 // get hospital basic details
 app.get('/hospitals', async(req, res) => {
     try {
-        const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1, 'mediaDetails.hospitalImageURL': 1 });
+        const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1, 'mediaDetails.hospitalImageURL': 1, 'hospitalDetails.servicesOffered': 1 });
 
         res.json(hospitals);
     } catch (error) {
