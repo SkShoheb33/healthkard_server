@@ -14,18 +14,12 @@ const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
-const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in'];
-
 const corsOptions = {
-    origin: function(origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    }
+    origin: /healthkard\.in$/,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    optionsSuccessStatus: 204
 };
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
