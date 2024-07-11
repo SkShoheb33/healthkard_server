@@ -15,10 +15,9 @@ const mongoURI = process.env.MONGODB_URL;
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 const corsOptions = {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: /^https:\/\/(www\.)?healthkard\.in$/,
     credentials: true,
-    optionsSuccessStatus: 204
+    optionsSuccessStatus: 200
 };
 
 app.use(express.json());
