@@ -12,6 +12,7 @@ const UserModel = require('./models/UserModel');
 const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
+app.use(refererAuth);
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 const corsOptions = {
