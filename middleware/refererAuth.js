@@ -1,5 +1,5 @@
 // middleware/refererAuth.js
-export default function refererAuth(req, res, next) {
+const refererAuth = (req, res, next) => {
     const referer = req.headers.referer || req.headers.origin;
     const allowedDomain = 'healthkard.in';
 
@@ -9,3 +9,5 @@ export default function refererAuth(req, res, next) {
         res.status(403).json({ message: 'Forbidden' });
     }
 }
+
+module.exports = refererAuth;
