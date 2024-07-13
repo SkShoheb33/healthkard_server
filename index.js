@@ -4,6 +4,8 @@ const axios = require('axios');
 const uniqid = require('uniqid');
 const sha256 = require('sha256');
 const app = express();
+const refererAuth = require('./middleware/refererAuth');
+app.use(refererAuth);
 require('dotenv').config();
 // const serverless = require('serverless-http');
 const HospitalModel = require('./models/HospitalModel');
@@ -12,7 +14,6 @@ const UserModel = require('./models/UserModel');
 const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
-app.use(refererAuth);
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
 const corsOptions = {
