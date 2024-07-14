@@ -387,6 +387,16 @@ app.get('/agents', async(req, res) => {
         res.status(500).send("Error while retriving");
     }
 });
+
+app.get('/agents/:agentID', async(req, res) => {
+    try {
+        const agentID = req.params.agentID;
+        const agents = await AgentModel.findOne({ agentID: agentID });
+        res.status(200).json(agents);
+    } catch (error) {
+        res.status(500).send("Error while retriving");
+    }
+});
 // checking agents
 app.get('/checkAgent/:agentID', async(req, res) => {
     try {
