@@ -21,7 +21,7 @@ mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
 //     credentials: true,
 //     optionsSuccessStatus: 200
 // };
-const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in'];
+const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in', 'https://www.healthkard.in', 'https://healthkard.in'];
 
 app.use(cors({
     origin: function(origin, callback) {
