@@ -16,11 +16,25 @@ const mongoose = require('mongoose');
 const mongoURI = process.env.MONGODB_URL;
 mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
     .catch(err => console.log(err));
-const corsOptions = {
-    origin: /^https:\/\/(www\.)?healthkard\.in$/,
+// const corsOptions = {
+//     origin: /^https:\/\/(www\.)?healthkard\.in$/,
+//     credentials: true,
+//     optionsSuccessStatus: 200
+// };
+const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in'];
+
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps, curl, etc.)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
-    optionsSuccessStatus: 200
-};
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
