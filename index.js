@@ -21,21 +21,53 @@ mongoose.connect(mongoURI).then(() => console.log('MongoDB Connected'))
 //     credentials: true,
 //     optionsSuccessStatus: 200
 // };
-const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in', 'https://www.healthkard.in', 'https://healthkard.in'];
+// const allowedOrigins = ['http://healthkard.in', 'http://www.healthkard.in', 'https://www.healthkard.in', 'https://healthkard.in'];
 
-app.use(cors({
+// app.use(cors({
+//     origin: function(origin, callback) {
+//         // Allow requests with no origin (like mobile apps, curl, etc.)
+//         if (!origin) return callback(null, true);
+//         if (allowedOrigins.indexOf(origin) === -1) {
+//             const msg = 'The CORS policy for this site does not allow access from the specified origin.';
+//             return callback(new Error(msg), false);
+//         }
+//         return callback(null, true);
+//     },
+//     credentials: true,
+// }));
+const allowedOrigins = [
+    'http://healthkard.in',
+    'http://www.healthkard.in',
+    'https://healthkard.in',
+    'https://www.healthkard.in'
+];
+
+// Middleware to set CORS headers dynamically
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+    }
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,OPTIONS,POST,PUT');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    next();
+});
+
+// CORS options
+const corsOptions = {
     origin: function(origin, callback) {
-        // Allow requests with no origin (like mobile apps, curl, etc.)
-        if (!origin) return callback(null, true);
-        if (allowedOrigins.indexOf(origin) === -1) {
-            const msg = 'The CORS policy for this site does not allow access from the specified origin.';
-            return callback(new Error(msg), false);
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        return callback(null, true);
     },
     credentials: true,
-}));
+};
 
+// Apply CORS middleware globally
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
