@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 
 // CORS options
 const corsOptions = {
-    origin: function(origin, callback) {
+    origin: function (origin, callback) {
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
@@ -80,7 +80,7 @@ app.listen(process.env.PORT, () => {
 });
 
 
-app.post('/saveHospitalData', async(req, res) => {
+app.post('/saveHospitalData', async (req, res) => {
     try {
         const hospitalData = req.body;
         await HospitalModel.create(hospitalData);
@@ -93,7 +93,7 @@ app.post('/saveHospitalData', async(req, res) => {
 
 
 // opt section
-app.post('/sendOTP', async(req, res) => {
+app.post('/sendOTP', async (req, res) => {
     const { to, subject, otp } = req.body;
     try {
 
@@ -127,7 +127,7 @@ app.post('/sendOTP', async(req, res) => {
 
 // hospital routes
 // checking for present or not
-app.get('/checkMail/:email', async(req, res) => {
+app.get('/checkMail/:email', async (req, res) => {
     const email = req.params.email;
     console.log(email)
     try {
@@ -143,67 +143,67 @@ app.get('/checkMail/:email', async(req, res) => {
     }
 });
 // getting hospital details by id
-app.get('/getHospitalDeatils/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).json(result.hospitalDetails);
-            } else {
-                res.status(200).json({ email: "not found", isverified: "0" });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+app.get('/getHospitalDeatils/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).json(result.hospitalDetails);
+        } else {
+            res.status(200).json({ email: "not found", isverified: "0" });
         }
-    })
-    // getting hospital doctorDetails by id
-app.get('/getDoctorDetails/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).json(result.doctorList);
-            } else {
-                res.status(200).json({ email: "not found", isverified: "0" });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting hospital doctorDetails by id
+app.get('/getDoctorDetails/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).json(result.doctorList);
+        } else {
+            res.status(200).json({ email: "not found", isverified: "0" });
         }
-    })
-    // getting hospital media Details by id
-app.get('/getMediaDeatils/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).json(result.mediaDetails);
-            } else {
-                res.status(200).json({ email: "not found", isverified: "0" });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting hospital media Details by id
+app.get('/getMediaDeatils/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).json(result.mediaDetails);
+        } else {
+            res.status(200).json({ email: "not found", isverified: "0" });
         }
-    })
-    // getting full hospital  Details by id
-app.get('/getHospital/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).json(result);
-            } else {
-                res.status(200).json({ email: "not found", isverified: "0" });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting full hospital  Details by id
+app.get('/getHospital/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(200).json({ email: "not found", isverified: "0" });
         }
-    })
-    // getting hospital users Details by id
-app.get('/getUsers/:hospitalId', async(req, res) => {
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting hospital users Details by id
+app.get('/getUsers/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     try {
         const result = await HospitalModel.findOne({ hospitalId });
@@ -217,7 +217,7 @@ app.get('/getUsers/:hospitalId', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-app.post('/addUserToHospital/:hospitalId', async(req, res) => {
+app.post('/addUserToHospital/:hospitalId', async (req, res) => {
     try {
         const { hospitalId } = req.params;
         const { user } = req.body;
@@ -242,39 +242,39 @@ app.post('/addUserToHospital/:hospitalId', async(req, res) => {
     }
 });
 // get name by id
-app.get('/getName/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        console.log(hospitalId)
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).send(result.hospitalDetails.hospitalLegalName);
-            } else {
-                res.status(200).send(hospitalId);
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+app.get('/getName/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    console.log(hospitalId)
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).send(result.hospitalDetails.hospitalLegalName);
+        } else {
+            res.status(200).send(hospitalId);
         }
-    })
-    // get email by id
-app.get('/getEmail/:hospitalId', async(req, res) => {
-        const hospitalId = req.params.hospitalId;
-        console.log(hospitalId)
-        try {
-            const result = await HospitalModel.findOne({ hospitalId });
-            if (result) {
-                res.status(200).send(result.email);
-            } else {
-                res.status(200).send(hospitalId);
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// get email by id
+app.get('/getEmail/:hospitalId', async (req, res) => {
+    const hospitalId = req.params.hospitalId;
+    console.log(hospitalId)
+    try {
+        const result = await HospitalModel.findOne({ hospitalId });
+        if (result) {
+            res.status(200).send(result.email);
+        } else {
+            res.status(200).send(hospitalId);
         }
-    })
-    // get details by id
-app.get('/getDetails/:hospitalId', async(req, res) => {
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// get details by id
+app.get('/getDetails/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     try {
         const result = await HospitalModel.findOne({ hospitalId });
@@ -287,7 +287,7 @@ app.get('/getDetails/:hospitalId', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
-app.put('/update/:hospitalId', async(req, res) => {
+app.put('/update/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     const updatedData = req.body;
     console.log(hospitalId)
@@ -301,7 +301,7 @@ app.put('/update/:hospitalId', async(req, res) => {
         res.status(500).json({ message: "Error updating hospital", error: error.message });
     }
 });
-app.put('/deleteMediaDetails/:hospitalId', async(req, res) => {
+app.put('/deleteMediaDetails/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     const updatedData = req.body;
     try {
@@ -314,7 +314,7 @@ app.put('/deleteMediaDetails/:hospitalId', async(req, res) => {
         res.status(500).json({ message: "Error updating hospital", error: error.message });
     }
 });
-app.get('/hospitalStats', async(req, res) => {
+app.get('/hospitalStats', async (req, res) => {
     try {
         const pendingCount = await HospitalModel.countDocuments({ isverified: 1 });
         const approvedCount = await HospitalModel.countDocuments({ isverified: 2 });
@@ -330,7 +330,7 @@ app.get('/hospitalStats', async(req, res) => {
 
 // techniqal routes
 // Route to get hospital IDs and names for verified hospitals for pending
-app.get('/verifiedHospitals', async(req, res) => {
+app.get('/verifiedHospitals', async (req, res) => {
     try {
         const verifiedHospitals = await HospitalModel.find({ isverified: '1' }, // Query condition
             { _id: 0, hospitalId: 1, 'hospitalDetails.hospitalLegalName': 1 } // Projection
@@ -342,7 +342,7 @@ app.get('/verifiedHospitals', async(req, res) => {
     }
 });
 // Route to get hospital IDs and names for verified hospitals for approved
-app.get('/approvedHospitals', async(req, res) => {
+app.get('/approvedHospitals', async (req, res) => {
     try {
         const verifiedHospitals = await HospitalModel.find({ isverified: '2' }, // Query condition
             { _id: 0, hospitalId: 1, 'hospitalDetails.hospitalLegalName': 1 }
@@ -356,7 +356,7 @@ app.get('/approvedHospitals', async(req, res) => {
 
 
 // update the isverified to 2
-app.put('/updateIsVerified/:hospitalId', async(req, res) => {
+app.put('/updateIsVerified/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     try {
         const updatedHospital = await HospitalModel.findOneAndUpdate({ hospitalId: hospitalId }, { isverified: '2' }, { new: true });
@@ -370,7 +370,7 @@ app.put('/updateIsVerified/:hospitalId', async(req, res) => {
 });
 
 
-app.delete('/deleteProfile/:hospitalId', async(req, res) => {
+app.delete('/deleteProfile/:hospitalId', async (req, res) => {
     const hospitalId = req.params.hospitalId;
     try {
         // Find the hospital profile by hospitalId and delete it
@@ -390,7 +390,7 @@ app.delete('/deleteProfile/:hospitalId', async(req, res) => {
     }
 });
 // get hospital basic details
-app.get('/hospitals', async(req, res) => {
+app.get('/hospitals', async (req, res) => {
     try {
         const hospitals = await HospitalModel.find({}, { hospitalId: 1, 'hospitalDetails.hospitalTradeName': 1, 'hospitalDetails.address': 1, 'mediaDetails.logoURL': 1, 'mediaDetails.hospitalImageURL': 1, 'hospitalDetails.servicesOffered': 1 });
 
@@ -403,7 +403,7 @@ app.get('/hospitals', async(req, res) => {
 
 // agent routes
 // Route to add an agent
-app.post('/addAgent', async(req, res) => {
+app.post('/addAgent', async (req, res) => {
     try {
         const agentData = req.body;
         await AgentModel.create(agentData);
@@ -412,7 +412,7 @@ app.post('/addAgent', async(req, res) => {
         res.status(500).send('Error saving Agent data');
     }
 });
-app.post('/reset-todays-count', async(req, res) => {
+app.post('/reset-todays-count', async (req, res) => {
     try {
         // Update all agents to set todaysCount to 0
         await AgentModel.updateMany({}, { $set: { todaysCount: 0 } });
@@ -424,7 +424,7 @@ app.post('/reset-todays-count', async(req, res) => {
 });
 
 // Route to get hospital IDs and names for agents
-app.get('/agents', async(req, res) => {
+app.get('/agents', async (req, res) => {
     try {
         const agents = await AgentModel.find({}, 'agentID name');
         res.status(200).json(agents);
@@ -433,7 +433,7 @@ app.get('/agents', async(req, res) => {
     }
 });
 
-app.get('/agents/:agentID', async(req, res) => {
+app.get('/agents/:agentID', async (req, res) => {
     try {
         const agentID = req.params.agentID;
         const agents = await AgentModel.findOne({ agentID: agentID });
@@ -443,7 +443,7 @@ app.get('/agents/:agentID', async(req, res) => {
     }
 });
 // checking agents
-app.get('/checkAgent/:agentID', async(req, res) => {
+app.get('/checkAgent/:agentID', async (req, res) => {
     try {
         const agentID = req.params.agentID;
         const agents = await AgentModel.find({ agentID: agentID });
@@ -460,37 +460,37 @@ app.get('/checkAgent/:agentID', async(req, res) => {
 
 
 // getting agent details by id
-app.get('/getAgentDetails/:agentId', async(req, res) => {
-        const agentID = req.params.agentId;
-        try {
-            const result = await AgentModel.findOne({ agentID });
-            if (result) {
-                res.status(200).json(result);
-            } else {
-                res.status(200).json({ email: "not found" });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+app.get('/getAgentDetails/:agentId', async (req, res) => {
+    const agentID = req.params.agentId;
+    try {
+        const result = await AgentModel.findOne({ agentID });
+        if (result) {
+            res.status(200).json(result);
+        } else {
+            res.status(200).json({ email: "not found" });
         }
-    })
-    // getting agent details by id
-app.get('/getAgentPassword/:email', async(req, res) => {
-        const email = req.params.email;
-        try {
-            const result = await AgentModel.findOne({ email });
-            if (result) {
-                res.status(200).json({ password: result.password, agentID: result.agentID });
-            } else {
-                res.status(200).json({ password: null });
-            }
-        } catch (err) {
-            console.error("Error while checking the email:", err);
-            res.status(500).json({ error: "Internal Server Error" });
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// getting agent details by id
+app.get('/getAgentPassword/:email', async (req, res) => {
+    const email = req.params.email;
+    try {
+        const result = await AgentModel.findOne({ email });
+        if (result) {
+            res.status(200).json({ password: result.password, agentID: result.agentID });
+        } else {
+            res.status(200).json({ password: null });
         }
-    })
-    // code to add the users to agents table
-app.put('/addUser/:agentID', async(req, res) => {
+    } catch (err) {
+        console.error("Error while checking the email:", err);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+})
+// code to add the users to agents table
+app.put('/addUser/:agentID', async (req, res) => {
     const agentID = req.params.agentID;
     try {
         const agent = await AgentModel.findOne({ agentID });
@@ -513,21 +513,21 @@ app.put('/addUser/:agentID', async(req, res) => {
     }
 });
 // update the payment status
-app.put('/payment/:healthId', async(req, res) => {
-        const healthId = req.params.healthId;
-        const paymentStatus = req.body.paymentStatus;
-        try {
-            const user = await UserModel.findOne({ healthId });
-            user.paymentStatus = paymentStatus;
-            await user.save();
-            res.send("Successfully updated");
-        } catch (err) {
-            console.log("Error while updating the status");
-        }
+app.put('/payment/:healthId', async (req, res) => {
+    const healthId = req.params.healthId;
+    const paymentStatus = req.body.paymentStatus;
+    try {
+        const user = await UserModel.findOne({ healthId });
+        user.paymentStatus = paymentStatus;
+        await user.save();
+        res.send("Successfully updated");
+    } catch (err) {
+        console.log("Error while updating the status");
+    }
 
-    })
-    // code to add the users to agents table
-app.put('/addHospital/:agentID', async(req, res) => {
+})
+// code to add the users to agents table
+app.put('/addHospital/:agentID', async (req, res) => {
     const agentID = req.params.agentID;
     try {
         const agent = await AgentModel.findOne({ agentID });
@@ -555,7 +555,7 @@ app.put('/addHospital/:agentID', async(req, res) => {
 
 
 // user rounts here
-app.post('/addUser', async(req, res) => {
+app.post('/addUser', async (req, res) => {
     try {
         const userData = req.body;
         await UserModel.create(userData);
@@ -566,7 +566,7 @@ app.post('/addUser', async(req, res) => {
     }
 });
 
-app.delete('/user/:userId', async(req, res) => {
+app.delete('/user/:userId', async (req, res) => {
     const healthId = req.params.userId;
     try {
         const result = await UserModel.findOneAndDelete({ healthId });
@@ -579,7 +579,7 @@ app.delete('/user/:userId', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
-app.delete('/agent/:agentID', async(req, res) => {
+app.delete('/agent/:agentID', async (req, res) => {
     const agentID = req.params.agentID;
     try {
         const result = await AgentModel.findOneAndDelete({ agentID });
@@ -592,7 +592,7 @@ app.delete('/agent/:agentID', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 })
-app.get('/getuserDetails/:userId', async(req, res) => {
+app.get('/getuserDetails/:userId', async (req, res) => {
     const healthId = req.params.userId;
     try {
         const result = await UserModel.findOne({ healthId });
@@ -607,7 +607,7 @@ app.get('/getuserDetails/:userId', async(req, res) => {
     }
 })
 
-app.get('/getUserNameID', async(req, res) => {
+app.get('/getUserNameID', async (req, res) => {
     try {
         const results = await UserModel.find({});
         if (results.length > 0) {
@@ -621,7 +621,7 @@ app.get('/getUserNameID', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-app.get('/getUsers', async(req, res) => {
+app.get('/getUsers', async (req, res) => {
     try {
         const results = await UserModel.find({});
         res.status(200).json(results);
@@ -630,7 +630,7 @@ app.get('/getUsers', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-app.get('/getUser/:healthId', async(req, res) => {
+app.get('/getUser/:healthId', async (req, res) => {
     try {
         const result = await UserModel.findOne({ healthId: req.params.healthId });
         res.status(200).json(result);
@@ -639,7 +639,7 @@ app.get('/getUser/:healthId', async(req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-app.get('/getUserByNumber/:number', async(req, res) => {
+app.get('/getUserByNumber/:number', async (req, res) => {
     try {
         const result = await UserModel.find({ number: req.params.number });
         res.status(200).json(result);
@@ -649,7 +649,7 @@ app.get('/getUserByNumber/:number', async(req, res) => {
     }
 });
 // stats for users active and total
-app.get('/userStats', async(req, res) => {
+app.get('/userStats', async (req, res) => {
     try {
         const currentDate = new Date();
         await UserModel.updateMany({ expireDate: { $lt: currentDate } }, { $set: { paymentStatus: false } });
@@ -666,7 +666,7 @@ app.get('/userStats', async(req, res) => {
     }
 });
 
-app.post('/sendCardURL', async(req, res) => {
+app.post('/sendCardURL', async (req, res) => {
     const { to, subject, url } = req.body;
     try {
 
@@ -695,7 +695,7 @@ app.post('/sendCardURL', async(req, res) => {
         res.status(500).json({ error: "An error occurred while sending the email.", error });
     }
 });
-app.post('/denyReason', async(req, res) => {
+app.post('/denyReason', async (req, res) => {
     const { to, subject, body } = req.body;
     try {
 
@@ -724,7 +724,7 @@ app.post('/denyReason', async(req, res) => {
         res.status(500).json({ error: "An error occurred while sending the email.", error });
     }
 });
-app.put('/visited/:healthId', async(req, res) => {
+app.put('/visited/:healthId', async (req, res) => {
     const healthId = req.params.healthId;
     try {
         const user = await UserModel.findOne({ healthId });
@@ -749,10 +749,10 @@ const MERCHANT_ID = process.env.MERCHANT_ID;
 const SALT_INDEX = process.env.SALT_INDEX;
 const SALT_KEY = process.env.SALT_KEY;
 const planPrices = {
-    'one month': 99,
-    'three months': 297,
-    'six months': 499,
-    'one year': 899
+    'one month': 19,
+    'three months': 49,
+    'six months': 99,
+    'one year': 149
 };
 app.get('/pay', (req, res) => {
     const { name, mobileNumber, healthID, plan, isNew } = req.query;
@@ -790,17 +790,17 @@ app.get('/pay', (req, res) => {
     };
     axios
         .request(options)
-        .then(function(response) {
+        .then(function (response) {
             const url = response.data.data.instrumentResponse.redirectInfo.url;
             // res.send(url);
             res.redirect(url);
             // res.send(response.data)
         })
-        .catch(function(error) {
+        .catch(function (error) {
             res.send({ message: "Error", error })
         });
 })
-app.get("/redirect-url/:merchantTransactionId", async(req, res) => {
+app.get("/redirect-url/:merchantTransactionId", async (req, res) => {
     const { merchantTransactionId } = req.params;
     const { healthID, plan, isNew } = req.query;
     if (merchantTransactionId) {
@@ -822,7 +822,7 @@ app.get("/redirect-url/:merchantTransactionId", async(req, res) => {
                     await axios.put(`${process.env.SERVER_URL}/payment/${healthID}`, { paymentStatus: true })
                 else
                     await axios.put(`${process.env.SERVER_URL}/renewal/${healthID}`, { planDuration: plan })
-                    // res.send(200).send("Payment successfull")
+                // res.send(200).send("Payment successfull")
                 res.redirect(`https://healthkard.in/userCard/${healthID}`);
             } else {
                 console.log("Payment failed:", response.data);
@@ -848,7 +848,7 @@ const planDurations = {
     'one year': 336
 };
 
-app.put('/renewal/:healthId', async(req, res) => {
+app.put('/renewal/:healthId', async (req, res) => {
     const { healthId } = req.params;
     const { planDuration } = req.body;
     try {
@@ -888,7 +888,7 @@ app.put('/renewal/:healthId', async(req, res) => {
 
 
 // send mail
-app.post('/sendMail', async(req, res) => {
+app.post('/sendMail', async (req, res) => {
     const { subject, message } = req.body;
     try {
 
