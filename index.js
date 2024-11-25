@@ -749,17 +749,17 @@ const MERCHANT_ID = process.env.MERCHANT_ID;
 const SALT_INDEX = process.env.SALT_INDEX;
 const SALT_KEY = process.env.SALT_KEY;
 const planPrices = {
-    'one month': 19,
-    'three months': 49,
-    'six months': 99,
-    'one year': 149
+    'one month': 22.42,
+    'three months': 57.82,
+    'six months': 116.82,
+    'one year': 175.82
 };
 app.get('/pay', (req, res) => {
     const { name, mobileNumber, healthID, plan, isNew } = req.query;
     const amount = planPrices[plan];
     const payEndPoint = '/pg/v1/pay';
     let merchantTransactionId = uniqid();
-    let merchantUserId = "MUID123";
+    let merchantUserId = healthID;
     const payload = {
         "merchantId": MERCHANT_ID,
         "merchantTransactionId": merchantTransactionId,
